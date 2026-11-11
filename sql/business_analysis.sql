@@ -56,6 +56,10 @@ SELECT
     ) AS missing_product,
 
     COUNT(*) FILTER (
+        WHERE category IS NULL
+    ) AS missing_category,
+
+    COUNT(*) FILTER (
         WHERE quantity IS NULL OR quantity <= 0
     ) AS invalid_quantity,
 
@@ -69,11 +73,11 @@ SELECT
     ) AS invalid_price,
 
     COUNT(*) FILTER (
-        WHERE order_date > CURRENT_DATE
-    ) AS future_dated_rows,
+        WHERE order_date IS NULL
+    ) AS missing_order_date,
 
     COUNT(*) FILTER (
-        WHERE order_date < DATE '2020-01-01'
-    ) AS unusually_old_dates
+        WHERE order_date > CURRENT_DATE
+    ) AS future_dated_rows
 
 FROM orders;
