@@ -174,7 +174,7 @@ def ecommerce_data_pipeline():
         print("Price validation: Passed")
         print("Order date validation: Passed")
 
-    # ==================================================
+      # ==================================================
     # Task 4: Load Clean Data into PostgreSQL
     # ==================================================
 
@@ -190,6 +190,21 @@ def ecommerce_data_pipeline():
         main()
 
     # ==================================================
+    # Task 5: Upload Processed Files to AWS S3
+    # ==================================================
+
+    @task(**retry_config)
+    def upload_to_s3():
+
+        import sys
+
+        sys.path.insert(0, "/opt/ecommerce_pipeline")
+
+        from src.upload_to_s3 import main
+
+        main()
+
+    # ==================================================
     # Create Task Instances
     # ==================================================
 
@@ -201,11 +216,13 @@ def ecommerce_data_pipeline():
 
     loading = load_to_postgres()
 
+    uploading = upload_to_s3()
+
     # ==================================================
     # Define Task Execution Order
     # ==================================================
 
-    inspection >> transformation >> validation >> loading
+    inspection >> transformation >> validation >> [loading, uploading]
 
 
 # ==================================================
