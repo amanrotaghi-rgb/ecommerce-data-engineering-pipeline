@@ -9,3 +9,5 @@ data/order_com.csv
 # Streamlit secrets
 .streamlit/secrets.toml
 data/
+
+dashboard/app_backup.py
