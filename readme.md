@@ -1,226 +1,212 @@
-# E-commerce Data Engineering Pipeline
+# E-Commerce Data Engineering Pipeline
 
-## Project Overview
+An end-to-end data engineering project demonstrating data ingestion, data cleaning, ETL processing, workflow orchestration, data warehousing, AWS S3 integration, and interactive analytics.
 
-An end-to-end E-commerce Data Engineering project that processes raw order data, performs data cleaning and validation, loads clean records into PostgreSQL, and stores processed datasets in AWS S3 for further analytics.
+## 🚀 Live Dashboard
 
-The complete workflow is orchestrated using Apache Airflow 3 and runs in a Docker-based environment.
+**[Explore the Live E-Commerce Dashboard](https://ecommerce-data-engineering-pipeline-mjnksmgna9ox88d4bvls6s.streamlit.app/)**
 
-The project demonstrates practical implementation of ETL pipelines, data quality checks, workflow orchestration, database integration, cloud storage, and SQL-based business analytics.
+The public dashboard uses an anonymized dataset. Live PostgreSQL, Airflow and AWS services are not connected to the hosted demo.
 
-## Architecture
+## 📌 Project Overview
+
+This project builds an automated e-commerce data pipeline to process raw order data, perform data quality checks, transform records, load clean data into PostgreSQL, and store processed datasets in Amazon S3.
+
+Apache Airflow orchestrates the pipeline, while Streamlit provides an interactive dashboard for exploring business and data quality metrics.
+
+## 🏗️ Architecture
 
 ```text
-             Raw E-commerce CSV
-                      |
-                      v
-              Python Data Inspection
-                      |
-                      v
-             Data Cleaning & Transformation
-                      |
-                      v
-             Clean + Rejected CSV Files
-                      |
-                      v
-               Airflow Validation
-                      |
-                 /         \
-                v           v
+              Raw E-Commerce CSV
+                       |
+                       v
+                 Data Inspection
+                       |
+                       v
+                 Data Cleaning
+                       |
+                       v
+                Data Validation
+                       |
+                +------+------+
+                |             |
+                v             v
           PostgreSQL       AWS S3
-          Data Warehouse   Cloud Storage
+          Data Warehouse   Data Storage
                 |
                 v
-          SQL Business Analytics
+          Business Analytics
+                |
+                v
+          Streamlit Dashboard
+
+        Apache Airflow orchestrates
+             the workflow
 ```
 
-Apache Airflow orchestrates the complete workflow, manages task dependencies, handles retries, and provides execution monitoring.
-
-After successful validation, PostgreSQL loading and AWS S3 uploading execute independently.
-
-## Implemented Features
-
-### Data Ingestion & Processing
-- CSV-based e-commerce data ingestion.
-- Data inspection and schema analysis.
-- Data cleaning and transformation using Python and Pandas.
-- Duplicate record identification and removal.
-- Handling missing and invalid values.
-- Separation of clean and rejected records.
-
-### Data Quality & Validation
-- Dedicated data validation task in Airflow.
-- Schema validation.
-- Missing-value checks.
-- Numeric data validation.
-- Business-rule validation.
-- Rejected record separation for data-quality analysis.
-
-### PostgreSQL Integration
-- PostgreSQL data warehouse integration.
-- Database connectivity through Airflow connections.
-- Batch data insertion.
-- Database transaction handling with commit and rollback.
-- Post-load row-count verification.
-
-### AWS S3 Integration
-- AWS authentication using Boto3.
-- Automated upload of processed datasets to Amazon S3.
-- Separate storage paths for clean and rejected records.
-- AWS credentials configured for the Airflow Docker environment.
-
-### Workflow Orchestration
-- Apache Airflow 3 DAG implementation.
-- Five independent task definitions.
-- Task dependencies and parallel execution.
-- Automatic task retries and retry delay.
-- Task failure callback configuration.
-- Pipeline execution monitoring through Airflow UI.
-
-### Business Analytics
-- SQL queries for business analysis.
-- Revenue analysis.
-- Product and category performance.
-- Monthly revenue trends.
-- Customer revenue analysis.
-
-## Technology Stack
+## 🛠️ Technology Stack
 
 | Category | Technologies |
 |---|---|
 | Programming | Python |
 | Data Processing | Pandas, NumPy |
 | Database | PostgreSQL |
+| SQL | SQL |
+| Orchestration | Apache Airflow |
 | Cloud Storage | AWS S3 |
-| AWS SDK | Boto3 |
-| Orchestration | Apache Airflow 3.3.2 |
-| Containerization | Docker, Docker Compose |
-| Database Integration | Airflow PostgreSQL Connection |
-| Analytics | SQL |
+| Dashboard | Streamlit |
+| Containers | Docker |
 | Version Control | Git, GitHub |
 
-## Dataset Information
+## ⚙️ ETL Workflow
 
-The project uses an e-commerce order dataset containing:
+1. **Data Ingestion:** Read raw e-commerce order data from CSV.
+2. **Data Inspection:** Examine columns, missing values, duplicates and data types.
+3. **Data Transformation:** Clean records, standardize values and handle invalid data.
+4. **Data Validation:** Separate valid records from rejected records and identify rejection reasons.
+5. **Data Loading:** Load clean records into PostgreSQL.
+6. **Cloud Storage:** Upload raw and processed datasets to Amazon S3.
+7. **Orchestration:** Use Apache Airflow to coordinate pipeline tasks.
+8. **Analytics:** Present business and data quality insights through Streamlit.
 
-- Order ID
-- Customer ID
-- Product
-- Category
-- Quantity
-- Price
-- Order Date
+## 📊 Dataset & Data Quality
 
-### Data Processing Results
+The original dataset contains 50,400 e-commerce order records.
 
 | Metric | Records |
 |---|---:|
 | Original records | 50,400 |
 | Duplicate records removed | 250 |
-| Records after deduplication | 50,150 |
 | Clean records | 48,083 |
 | Rejected records | 2,067 |
 
-Clean and rejected records are saved separately for further processing and data-quality analysis.
+The pipeline handles:
+- Missing values
+- Duplicate records
+- Invalid dates
+- Invalid and negative prices
+- Invalid and non-positive quantities
+- Missing customer and product information
 
-## Airflow Pipeline
+## 📈 Dashboard Features
 
-The `ecommerce_data_pipeline` DAG consists of five tasks:
+The interactive dashboard includes four sections:
 
-1. **inspect_data** – Inspects the source CSV and analyzes its structure and data quality.
-2. **transform_data** – Cleans the dataset, removes duplicates, and separates rejected records.
-3. **validate_data** – Validates the transformed CSV schema, missing values, numeric fields, and business rules.
-4. **load_to_postgres** – Loads validated records into PostgreSQL and verifies the database contents.
-5. **upload_to_s3** – Uploads clean and rejected CSV files to Amazon S3.
+- **Pipeline Overview:** Order metrics, revenue and business summaries.
+- **Data Quality:** Data quality checks and validation insights.
+- **Warehouse Analytics:** Category and sales analysis.
+- **Raw Data Explorer:** Search, explore and download anonymized order data.
 
-### Execution Flow
+## ☁️ AWS Integration
 
-```text
-inspect_data
-      |
-      v
-transform_data
-      |
-      v
-validate_data
-      |
-      +-------------------+
-      |                   |
-      v                   v
-load_to_postgres      upload_to_s3
-```
+Amazon S3 is used to store pipeline datasets.
 
-### Reliability Features
-
-- Two retries per task.
-- One-minute retry delay.
-- Task failure callback.
-- Database transaction rollback on loading errors.
-- Post-load row-count verification.
-- Repeat execution testing.
-
-## AWS S3 Storage
-
-Processed datasets are stored in the following S3 bucket:
-
-`aman-ecommerce-de-pipeline-prod`
-
-Storage structure:
+Example object structure:
 
 ```text
-processed/
-    orders/
-        orders_clean.csv
-        orders_rejected.csv
+s3://aman-ecommerce-de-pipeline-prod/
+│
+├── raw/
+│   └── orders/
+│       └── order_com.csv
+│
+└── processed/
+    └── orders/
+        ├── orders_clean.csv
+        └── orders_rejected.csv
 ```
 
-Both processed files were successfully uploaded and verified in Amazon S3.
+## 📂 Project Structure
 
-## Business Analytics
+```text
+ecommerce-data-engineering-pipeline/
+│
+├── airflow/
+│   └── DAG files and configuration
+│
+├── dashboard/
+│   ├── app.py
+│   ├── demo_data/
+│   │   └── orders_demo.csv
+│   └── test_airflow_api.py
+│
+├── sql/
+│   └── business_analysis.sql
+│
+├── src/
+│   ├── inspect_data.py
+│   ├── transform_data.py
+│   ├── load_to_postgres.py
+│   ├── upload_to_s3.py
+│   └── download_from_s3.py
+│
+├── requirements.txt
+├── Dockerfile
+└── .gitignore
+```
 
-SQL queries are used to analyze:
+## 💻 Run the Public Demo Locally
 
-- Total revenue.
-- Revenue by product category.
-- Top-selling products.
-- Monthly revenue trends.
-- Top customers by revenue.
-- Data quality metrics.
+### 1. Clone the repository
 
-## Project Validation
+```bash
+git clone https://github.com/amanrotaghi-rgb/ecommerce-data-engineering-pipeline.git
+```
 
-The complete five-task Airflow pipeline has been executed successfully.
+### 2. Enter the project directory
 
-Verification results:
+```bash
+cd ecommerce-data-engineering-pipeline
+```
 
-- All five Airflow tasks completed successfully.
-- 48,083 clean records loaded into PostgreSQL.
-- PostgreSQL row count matched the clean CSV row count.
-- 2,067 rejected records generated separately.
-- Clean and rejected records reconciled to 50,150 records after deduplication.
-- Both processed CSV files successfully uploaded to AWS S3.
-- Pipeline successfully executed again after PostgreSQL credential rotation.
+### 3. Create a virtual environment
 
-## Future Enhancements
+```bash
+python -m venv .venv
+```
 
-- API-based data ingestion.
-- PySpark-based distributed data transformations.
-- Bronze, Silver, and Gold data architecture.
-- Automated unit and integration testing.
-- Enhanced failure notifications.
-- Interactive business analytics dashboard using Streamlit.
+### 4. Activate the environment (Windows)
 
-## Project Status
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-**Core Python ETL, data validation, PostgreSQL integration, AWS S3 storage, SQL analytics, and Apache Airflow orchestration implemented and tested.**
+### 5. Install dependencies
 
-Further enhancements are planned to extend the pipeline with distributed processing, additional ingestion methods, and business intelligence capabilities.
+```bash
+pip install -r requirements.txt
+```
+
+### 6. Run the dashboard
+
+```bash
+python -m streamlit run dashboard/app.py
+```
+
+Open the local URL displayed by Streamlit, usually:
+
+`http://localhost:8501`
+
+The public demo runs using the bundled anonymized CSV dataset.
+
+## 🔐 Security & Demo Limitations
+
+- Original local data is not included in the public demo.
+- The dashboard uses anonymized order and customer identifiers.
+- Credentials and environment files are excluded from Git.
+- Public dashboard analytics use the bundled demo dataset.
+- PostgreSQL, Airflow and AWS are not live-connected to the hosted dashboard.
 
 ## Author
 
 **Aman Rotaghi**
 
-B.Tech Computer Science Engineering Student
+B.Tech Computer Science Engineering
 
 GitHub: [amanrotaghi-rgb](https://github.com/amanrotaghi-rgb)
 
+LinkedIn: [Connect on LinkedIn](https://www.linkedin.com/in/aman-rotaghi-5326073a8/)
+
+---
+
+*Built as a hands-on Data Engineering portfolio project.*
